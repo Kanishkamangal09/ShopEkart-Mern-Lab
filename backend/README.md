@@ -338,3 +338,44 @@ Query parameters for `GET /products` (all optional, can be combined):
 10. `GET /products/<copy an _id>` and expect `200`.
 11. `GET /products/abc` and expect `400`.
 12. `GET /products/66d123abc456def789012345` (valid format, not in DB) and expect `404`.
+
+---
+
+# Lab 04 – Wishlist
+
+## New / changed files
+
+```text
+backend/
+├── models/customer.model.js           + wishlist: [ObjectId] with ref: 'Product', default []
+├── controllers/wishlist.controller.js getWishlist, addToWishlist, removeFromWishlist, toggleWishlist
+├── routes/wishlist.routes.js          /wishlist routes (all protected with authMiddleware)
+├── middlewares/auth.middleware.js     now also accepts "Authorization: Bearer <token>"
+└── utils/isValidId.js                 checks a MongoDB id is 24 hex characters
+```
+
+## Wishlist APIs (all need login)
+
+| Method | URL | Purpose | Status codes |
+| --- | --- | --- | --- |
+| GET | `/wishlist` | Current user's wishlist (populated) | 200, 401 |
+| POST | `/wishlist/:productId` | Add product | 201, 400, 401, 404, 409 |
+| DELETE | `/wishlist/:productId` | Remove product | 200, 400, 401, 404 |
+| PATCH | `/wishlist/:productId/toggle` | Bonus: add if missing, remove if saved | 200, 400, 401, 404 |
+
+There is no `/wishlist/:userId` route. The user always comes from the JWT (`req.user`).
+
+## Postman test plan
+
+Log in first with `POST /customers/login`. Postman saves the `token` cookie and sends it automatically.
+(Or copy the token value and add the header `Authorization: Bearer <token>`.)
+
+1. `POST /wishlist/<productId>` and expect `201`.
+2. Same request again and expect `409` (already in wishlist).
+3. `GET /wishlist` and expect only your products, with full product details (populate).
+4. `DELETE /wishlist/<productId>` and expect `200`.
+5. Same delete again and expect `404` (not in wishlist).
+6. `POST /wishlist/abc` and expect `400` (invalid id).
+7. `POST /wishlist/66d123abc456def789012345` and expect `404` (product not found).
+8. Delete the cookie (Cookies → token → delete) and call `GET /wishlist`; expect `401`.
+9. Bonus: `PATCH /wishlist/<productId>/toggle` twice, expecting `saved: true` and then `saved: false`.

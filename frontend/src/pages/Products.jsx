@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { getProducts } from '../services/api';
+import { getProducts, getWishlist } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
 import Loader from '../components/Loader';
@@ -17,6 +17,23 @@ function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // ids of products the user has saved, so cards can show ♥ or ♡
+  const [savedIds, setSavedIds] = useState([]);
+
+  // load the wishlist once (not on every search)
+  useEffect(() => {
+    getWishlist()
+      .then((data) => setSavedIds(data.wishlist.map((product) => product._id)))
+      .catch((err) => console.error('Could not load wishlist', err));
+  }, []);
+
+  // called by a card after it adds/removes a product
+  const handleWishlistChange = (productId, saved) => {
+    setSavedIds((prev) =>
+      saved ? [...prev, productId] : prev.filter((id) => id !== productId)
+    );
+  };
 
   // runs every time search, category or sort changes
   useEffect(() => {
@@ -78,7 +95,12 @@ function Products() {
           <p className="muted result-count">{products.length} products found</p>
           <div className="product-grid">
             {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
+              <ProductCard
+                key={product._id}
+                product={product}
+                saved={savedIds.includes(product._id)}
+                onWishlistChange={handleWishlistChange}
+              />
             ))}
           </div>
         </>

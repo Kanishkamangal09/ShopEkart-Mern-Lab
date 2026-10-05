@@ -3,7 +3,13 @@ const Customer = require('../models/customer.model');
 
 async function authMiddleware(req, res, next) {
   try {
-    const token = req.cookies.token;
+    // token comes from the login cookie, or from an "Authorization: Bearer <token>" header (Postman)
+    let token = req.cookies.token;
+    const authHeader = req.headers.authorization;
+
+    if (!token && authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    }
 
     if (!token) {
       return res.status(401).json({ message: 'Authentication required' });

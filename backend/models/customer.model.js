@@ -18,6 +18,11 @@ const customerSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true
+    },
+    // stores only Product ids (references), not full product objects
+    wishlist: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+      default: []
     }
   },
   {

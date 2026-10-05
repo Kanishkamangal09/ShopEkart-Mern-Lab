@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
 const Product = require('../models/product.model');
+const isValidId = require('../utils/isValidId');
 
 // POST /products
 async function createProduct(req, res) {
@@ -82,7 +82,7 @@ async function getProductById(req, res) {
   try {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!isValidId(id)) {
       return res.status(400).json({ message: 'Invalid product ID' });
     }
 

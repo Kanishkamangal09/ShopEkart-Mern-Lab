@@ -44,3 +44,31 @@ export function getProducts(search, category, sort) {
 export function getProductById(id) {
   return apiRequest(`/products/${id}`);
 }
+
+// ---------- Wishlist APIs (all need login, the cookie is sent automatically) ----------
+
+// Tell the Navbar the new wishlist count (bonus). Every wishlist API response includes "count".
+function updateWishlistCount(count) {
+  window.dispatchEvent(new CustomEvent('wishlist-count', { detail: count }));
+}
+
+// GET /wishlist
+export async function getWishlist() {
+  const data = await apiRequest('/wishlist');
+  updateWishlistCount(data.count);
+  return data;
+}
+
+// POST /wishlist/:productId
+export async function addToWishlist(productId) {
+  const data = await apiRequest(`/wishlist/${productId}`, { method: 'POST' });
+  updateWishlistCount(data.count);
+  return data;
+}
+
+// DELETE /wishlist/:productId
+export async function removeFromWishlist(productId) {
+  const data = await apiRequest(`/wishlist/${productId}`, { method: 'DELETE' });
+  updateWishlistCount(data.count);
+  return data;
+}
