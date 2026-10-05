@@ -279,3 +279,62 @@ This project is a customer authentication backend built with Node.js, Express, M
 The register controller validates the fields, checks for a duplicate email, hashes the password with bcrypt, and saves the customer. The login controller finds the customer, compares the entered password with bcrypt, creates a JWT containing the customer ID, and stores it in an HttpOnly cookie.
 
 Protected routes use authentication middleware. The middleware reads the token from `req.cookies`, verifies it with the JWT secret, finds the customer in MongoDB, and attaches the customer to `req.user`. The profile controller returns safe customer details, logout clears the cookie, and change-password verifies the old password before hashing and saving the new one. Passwords and password hashes are never returned in API responses.
+
+---
+
+# Lab 03 – Product Catalog & Discovery
+
+## New files
+
+```text
+backend/
+├── models/product.model.js           Product schema (name, description, price, category, image, stock, createdAt)
+├── controllers/product.controller.js createProduct, getProducts, getProductById
+├── routes/product.routes.js          /products routes
+└── utils/seedProducts.js             inserts 10 sample products (npm run seed)
+```
+
+## Add sample products
+
+```bash
+npm run seed
+```
+
+The script only inserts products if the collection is empty, so running it twice does not create duplicates.
+
+## Product APIs
+
+| Method | URL | Purpose |
+| --- | --- | --- |
+| POST | `/products` | Create a product |
+| GET | `/products` | Get all products |
+| GET | `/products/:id` | Get one product |
+
+Query parameters for `GET /products` (all optional, can be combined):
+
+| Query | Example | What it does |
+| --- | --- | --- |
+| `search` | `?search=keyboard` | name contains the text (case-insensitive) |
+| `category` | `?category=Electronics` | only that category |
+| `sort` | `?sort=price_asc` / `?sort=price_desc` | sort by price (bonus) |
+
+### Status codes
+
+- `POST /products`: `201` created, `400` missing field / price ≤ 0 / negative stock
+- `GET /products/:id`: `200` found, `400` invalid id, `404` not found
+- `500`: unexpected server error
+
+## Postman testing order
+
+1. `POST /products` with a full body and expect `201`.
+2. `POST /products` without `name` and expect `400`.
+3. `POST /products` with `"price": 0` and expect `400`.
+4. `POST /products` with `"stock": -1` and expect `400`.
+5. `GET /products` and check `count` and the `products` array.
+6. `GET /products?search=KEY` and check the search is case-insensitive.
+7. `GET /products?category=Books`.
+8. `GET /products?search=s&category=Fashion` (both filters together).
+9. `GET /products?sort=price_asc` and `?sort=price_desc`.
+10. `GET /products/<copy an _id>` and expect `200`.
+11. `GET /products/abc` and expect `400`.
+12. `GET /products/66d123abc456def789012345` (valid format, not in DB) and expect `404`.

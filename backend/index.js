@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const customerRoutes = require('./routes/customer.routes');
+const productRoutes = require('./routes/product.routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,6 +19,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use('/customers', customerRoutes);
+app.use('/products', productRoutes);
 
 async function startServer() {
   try {
@@ -28,7 +30,7 @@ async function startServer() {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('MongoDB connection failed');
+    console.error('MongoDB connection failed:', error.message);
     process.exit(1);
   }
 }

@@ -13,8 +13,8 @@ function Footer() {
           <ul>
             <li>Electronics</li>
             <li>Fashion</li>
-            <li>Home &amp; Living</li>
-            <li>Beauty</li>
+            <li>Books</li>
+            <li>Home</li>
           </ul>
         </div>
         <div>

@@ -7,6 +7,8 @@ import { GuestRoute, ProtectedRoute } from './components/RouteGuards';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
+import Products from './pages/Products';
+import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
@@ -29,6 +31,8 @@ function App() {
 
                 <Route element={<ProtectedRoute />}>
                   <Route path="/home" element={<Home />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/products/:id" element={<ProductDetails />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/profile" element={<Profile />} />
                 </Route>

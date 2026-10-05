@@ -26,3 +26,21 @@ export async function apiRequest(endpoint, options = {}) {
 
   return data;
 }
+
+// ---------- Product APIs ----------
+
+// GET /products?search=...&category=...&sort=...
+export function getProducts(search, category, sort) {
+  const params = new URLSearchParams();
+
+  if (search) params.append('search', search);
+  if (category) params.append('category', category);
+  if (sort) params.append('sort', sort);
+
+  return apiRequest(`/products?${params.toString()}`);
+}
+
+// GET /products/:id
+export function getProductById(id) {
+  return apiRequest(`/products/${id}`);
+}

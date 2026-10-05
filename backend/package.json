@@ -4,7 +4,8 @@
   "description": "ShopKart customer authentication service for Engineering Lab 01",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "seed": "node utils/seedProducts.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

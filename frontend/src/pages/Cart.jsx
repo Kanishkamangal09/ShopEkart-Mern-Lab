@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
-import { formatPrice } from '../data/products';
+import { formatPrice } from '../data/categories';
 import Icon from '../components/Icon';
 
 const FREE_SHIPPING_LIMIT = 999;
@@ -12,7 +12,6 @@ function Cart() {
   const [orderPlaced, setOrderPlaced] = useState(false);
 
   const shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_LIMIT ? 0 : SHIPPING_FEE;
-  const savings = items.reduce((sum, item) => sum + (item.oldPrice - item.price) * item.quantity, 0);
   const total = subtotal + shipping;
 
   const handleCheckout = () => {
@@ -44,7 +43,7 @@ function Cart() {
           <Icon name="cart" size={40} />
           <h3>Your cart is empty</h3>
           <p>Looks like you haven&apos;t added anything yet.</p>
-          <Link to="/home" className="btn btn-primary">
+          <Link to="/products" className="btn btn-primary">
             Start shopping
           </Link>
         </div>
@@ -55,7 +54,7 @@ function Cart() {
   return (
     <div className="container page">
       <div className="page-head">
-        <Link to="/home" className="back-link">
+        <Link to="/products" className="back-link">
           <Icon name="arrowLeft" size={18} /> Continue shopping
         </Link>
         <h1>
@@ -73,7 +72,6 @@ function Cart() {
                 <h3>{item.name}</h3>
                 <div className="price-row">
                   <strong>{formatPrice(item.price)}</strong>
-                  <s>{formatPrice(item.oldPrice)}</s>
                 </div>
               </div>
               <div className="qty">
@@ -115,10 +113,6 @@ function Cart() {
           <div className="summary-row">
             <span>Shipping</span>
             <span>{shipping === 0 ? <span className="text-success">Free</span> : formatPrice(shipping)}</span>
-          </div>
-          <div className="summary-row text-success">
-            <span>You save</span>
-            <span>{formatPrice(savings)}</span>
           </div>
           {shipping > 0 && (
             <p className="summary-note">

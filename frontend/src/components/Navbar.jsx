@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { useCart } from '../context/useCart';
 import Icon from './Icon';
@@ -10,9 +9,6 @@ function Navbar() {
   const { cartCount } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const urlQuery = searchParams.get('q') || '';
-
   const isAuthPage = ['/login', '/register'].includes(location.pathname);
 
   const handleLogout = async () => {
@@ -43,12 +39,12 @@ function Navbar() {
       <div className="container navbar-inner">
         <Logo />
 
-        {/* key resets the box when the URL query changes (e.g. "Clear filters") */}
-        <SearchBox key={urlQuery} initialQuery={urlQuery} />
-
         <nav className="nav-actions">
-          <NavLink to="/home" end className="nav-link">
+          <NavLink to="/home" className="nav-link">
             Home
+          </NavLink>
+          <NavLink to="/products" className="nav-link">
+            Products
           </NavLink>
 
           <Link to="/cart" className="icon-btn" aria-label={`Cart, ${cartCount} items`}>
@@ -67,30 +63,6 @@ function Navbar() {
         </nav>
       </div>
     </header>
-  );
-}
-
-function SearchBox({ initialQuery }) {
-  const navigate = useNavigate();
-  const [query, setQuery] = useState(initialQuery);
-
-  const handleSearch = (event) => {
-    event.preventDefault();
-    const q = query.trim();
-    navigate(q ? `/home?q=${encodeURIComponent(q)}#products` : '/home#products');
-  };
-
-  return (
-    <form className="search-box" onSubmit={handleSearch} role="search">
-      <Icon name="search" size={18} />
-      <input
-        type="search"
-        placeholder="Search for products..."
-        aria-label="Search products"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
-    </form>
   );
 }
 

@@ -1,8 +1,6 @@
-import { useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
-import { categories, products } from '../data/products';
-import ProductCard from '../components/ProductCard';
+import { categories } from '../data/categories';
 import Icon from '../components/Icon';
 
 const highlights = [
@@ -13,28 +11,6 @@ const highlights = [
 
 function Home() {
   const { user } = useAuth();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const query = searchParams.get('q') || '';
-  const activeCategory = searchParams.get('category') || 'All';
-
-  const filteredProducts = useMemo(() => {
-    const q = query.toLowerCase();
-    return products.filter((product) => {
-      const matchesCategory = activeCategory === 'All' || product.category === activeCategory;
-      const matchesQuery =
-        !q || product.name.toLowerCase().includes(q) || product.category.toLowerCase().includes(q);
-      return matchesCategory && matchesQuery;
-    });
-  }, [query, activeCategory]);
-
-  const selectCategory = (name) => {
-    const next = new URLSearchParams(searchParams);
-    if (name === 'All') next.delete('category');
-    else next.set('category', name);
-    setSearchParams(next);
-  };
-
-  const clearFilters = () => setSearchParams({});
 
   return (
     <div className="container page">
@@ -44,11 +20,11 @@ function Home() {
           <h1>
             Hi {user.fullName.split(' ')[0]}, find something <span className="text-accent">you&apos;ll love.</span>
           </h1>
-          <p>Hand-picked electronics, fashion, home and beauty products at student-friendly prices.</p>
+          <p>Electronics, fashion, books and home products at student-friendly prices.</p>
           <div className="hero-actions">
-            <a href="#products" className="btn btn-primary btn-lg">
+            <Link to="/products" className="btn btn-primary btn-lg">
               Shop now
-            </a>
+            </Link>
             <Link to="/cart" className="btn btn-outline btn-lg">
               View cart
             </Link>
@@ -58,7 +34,6 @@ function Home() {
           <img
             src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1000&q=80"
             alt="Shopping bags and gifts"
-            onError={(e) => (e.currentTarget.style.visibility = 'hidden')}
           />
         </div>
       </section>
@@ -83,64 +58,23 @@ function Home() {
             <span className="eyebrow">Browse</span>
             <h2>Shop by category</h2>
           </div>
+          <Link to="/products" className="btn btn-outline btn-sm">
+            View all products
+          </Link>
         </div>
 
         <div className="category-grid">
           {categories.map((category) => (
-            <button
+            <Link
               key={category.name}
-              type="button"
-              className={`category-card ${activeCategory === category.name ? 'is-active' : ''}`}
-              onClick={() => {
-                selectCategory(category.name);
-                document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+              to={`/products?category=${encodeURIComponent(category.name)}`}
+              className="category-card"
             >
               <img src={category.image} alt="" loading="lazy" />
               <span className="category-label">{category.name}</span>
-            </button>
+            </Link>
           ))}
         </div>
-      </section>
-
-      <section className="section" id="products">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">Best sellers</span>
-            <h2>{query ? `Results for "${query}"` : 'Featured products'}</h2>
-          </div>
-          <span className="muted">{filteredProducts.length} items</span>
-        </div>
-
-        <div className="chip-row">
-          {['All', ...categories.map((c) => c.name)].map((name) => (
-            <button
-              key={name}
-              type="button"
-              className={`chip ${activeCategory === name ? 'is-active' : ''}`}
-              onClick={() => selectCategory(name)}
-            >
-              {name}
-            </button>
-          ))}
-        </div>
-
-        {filteredProducts.length > 0 ? (
-          <div className="product-grid">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <Icon name="search" size={36} />
-            <h3>No products found</h3>
-            <p>Try a different search term or category.</p>
-            <button type="button" className="btn btn-outline" onClick={clearFilters}>
-              Clear filters
-            </button>
-          </div>
-        )}
       </section>
     </div>
   );
