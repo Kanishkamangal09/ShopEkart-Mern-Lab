@@ -1,7 +1,7 @@
 {
-  "name": "shopkart-customer-authentication-service",
+  "name": "shopkart-backend",
   "version": "1.0.0",
-  "description": "ShopKart customer authentication service for Engineering Lab 01",
+  "description": "ShopKart backend API (Express + MongoDB)",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

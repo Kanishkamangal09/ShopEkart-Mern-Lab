@@ -6,7 +6,7 @@ function Footer() {
       <div className="container footer-grid">
         <div>
           <Logo />
-          <p className="footer-text">Fresh finds for everyday life. A MERN stack mini project.</p>
+          <p className="footer-text">Fresh finds for everyday life, delivered to your door.</p>
         </div>
         <div>
           <h4>Shop</h4>

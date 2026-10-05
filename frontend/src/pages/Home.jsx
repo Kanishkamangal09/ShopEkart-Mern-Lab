@@ -20,7 +20,7 @@ function Home() {
           <h1>
             Hi {user.fullName.split(' ')[0]}, find something <span className="text-accent">you&apos;ll love.</span>
           </h1>
-          <p>Electronics, fashion, books and home products at student-friendly prices.</p>
+          <p>Electronics, fashion, books and home products at prices you will love.</p>
           <div className="hero-actions">
             <Link to="/products" className="btn btn-primary btn-lg">
               Shop now
