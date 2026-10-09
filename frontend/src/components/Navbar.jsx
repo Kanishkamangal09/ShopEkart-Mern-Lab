@@ -57,7 +57,7 @@ function Navbar() {
         <Logo />
 
         <nav className="nav-actions">
-          <NavLink to="/home" className="nav-link">
+          <NavLink to="/home" className="nav-link nav-home">
             Home
           </NavLink>
           <NavLink to="/products" className="nav-link">
@@ -69,6 +69,9 @@ function Navbar() {
 
           <NavLink to="/cart" className="nav-link">
             Cart{cartCount > 0 && <span className="nav-count nav-count-cart">{cartCount}</span>}
+          </NavLink>
+          <NavLink to="/orders" className="nav-link">
+            Orders
           </NavLink>
 
           <Link to="/profile" className="avatar-link" title="My profile">

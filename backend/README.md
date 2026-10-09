@@ -8,4 +8,4 @@ npm start        # starts the API on http://localhost:5001
 npm run seed     # adds 10 sample products (only if the collection is empty)
 ```
 
-Environment variables (`.env`): `PORT`, `MONGO_URI`, `JWT_SECRET`.
+Environment variables (`.env`, see `.env.example`): `PORT`, `MONGO_URI`, `JWT_SECRET`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `ADMIN_KEY` (optional).

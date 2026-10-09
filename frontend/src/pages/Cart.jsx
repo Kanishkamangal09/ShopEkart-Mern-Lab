@@ -73,10 +73,16 @@ function Cart() {
           {hasStockProblem && (
             <p className="summary-note">Some items are above the available stock. Please update them.</p>
           )}
-          <button type="button" className="btn btn-primary btn-block btn-lg" disabled={hasStockProblem}>
-            Proceed to Checkout
-          </button>
-          <p className="summary-small">Delivery charges are calculated at checkout.</p>
+          {hasStockProblem ? (
+            <button type="button" className="btn btn-primary btn-block btn-lg" disabled>
+              Proceed to Checkout
+            </button>
+          ) : (
+            <Link to="/checkout" className="btn btn-primary btn-block btn-lg">
+              Proceed to Checkout
+            </Link>
+          )}
+          <p className="summary-small">Free delivery on every order.</p>
         </aside>
       </div>
     </div>

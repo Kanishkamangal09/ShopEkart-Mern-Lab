@@ -55,6 +55,11 @@ export function CartProvider({ children }) {
     setCartItems(data.cart);
   };
 
+  // after a successful order the backend has already emptied the cart, so we just empty our copy
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   // ---- derived values: calculated from cartItems, never stored ----
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -76,6 +81,7 @@ export function CartProvider({ children }) {
         addToCart,
         updateQuantity,
         removeFromCart,
+        clearCart,
         refreshCart
       }}
     >

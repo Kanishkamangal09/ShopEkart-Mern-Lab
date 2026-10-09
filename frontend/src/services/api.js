@@ -100,3 +100,26 @@ export function updateCartItem(productId, quantity) {
 export function removeCartItem(productId) {
   return apiRequest(`/cart/${productId}`, { method: 'DELETE' });
 }
+
+// ---------- Order APIs (all need login) ----------
+
+// POST /orders/create-payment-order  -> only the shipping address is sent.
+// The server reads the cart itself and calculates the total.
+export function createPaymentOrder(shippingAddress) {
+  return apiRequest('/orders/create-payment-order', { method: 'POST', body: { shippingAddress } });
+}
+
+// POST /orders/verify-payment  -> sends what Razorpay gave us, the server checks the signature
+export function verifyPayment(paymentDetails) {
+  return apiRequest('/orders/verify-payment', { method: 'POST', body: paymentDetails });
+}
+
+// GET /orders
+export function getOrders() {
+  return apiRequest('/orders');
+}
+
+// GET /orders/:id
+export function getOrder(id) {
+  return apiRequest(`/orders/${id}`);
+}
