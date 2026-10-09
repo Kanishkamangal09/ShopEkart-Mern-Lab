@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { formatPrice } from '../data/categories';
 import StockStatus from './StockStatus';
 import WishlistButton from './WishlistButton';
+import AddToCartButton from './AddToCartButton';
 import Icon from './Icon';
 
 function ProductCard({ product, saved, onWishlistChange }) {
@@ -25,7 +26,8 @@ function ProductCard({ product, saved, onWishlistChange }) {
         <StockStatus stock={product.stock} />
 
         <div className="card-actions">
-          <Link to={`/products/${product._id}`} className="btn btn-primary btn-block">
+          <AddToCartButton product={product} />
+          <Link to={`/products/${product._id}`} className="btn btn-outline btn-block">
             View Details
           </Link>
           <WishlistButton productId={product._id} saved={saved} onChange={onWishlistChange} />

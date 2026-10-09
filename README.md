@@ -1,6 +1,6 @@
 # 🛍️ ShopKart
 
-An online shopping app where people can sign up, browse products, search and filter the catalogue, and save favourites to a wishlist.
+An online shopping app where people can sign up, browse products, search and filter the catalogue, save favourites to a wishlist and build a shopping cart.
 
 Built with **MongoDB, Express, React and Node.js**.
 
@@ -12,7 +12,7 @@ Built with **MongoDB, Express, React and Node.js**.
 - **Catalogue:** products come from the database, with search by name, category filter and price sorting
 - **Product page:** large image, description, price and stock
 - **Wishlist:** save products with ♡, view them later, remove them; the saved count shows in the navbar
-- **Cart:** add items and change quantities (stored in the browser for now)
+- **Cart:** add items, change quantities, remove items and see the order summary. The cart is saved to your account and never goes above the available stock
 - Works on desktop and mobile
 
 ---
@@ -70,18 +70,18 @@ frontend/src/
 ├── services/api.js     every API call
 ├── pages/              Home, Products, ProductDetails, Wishlist, Cart, Profile, Login, Register
 ├── components/         Navbar, ProductCard, WishlistButton, SearchBar, ...
-└── context/            logged-in user and cart
+└── context/            shared state: logged-in user (AuthContext) and cart (CartContext)
 ```
 
 ---
 
 ## Data Model
 
-**Customer:** `fullName`, `email` (unique), `password` (bcrypt hash), `phone`, `wishlist`, `createdAt`
+**Customer:** `fullName`, `email` (unique), `password` (bcrypt hash), `phone`, `wishlist`, `cart`, `createdAt`
 
 **Product:** `name`, `description`, `price` (> 0), `category`, `image`, `stock` (≥ 0), `createdAt`
 
-The wishlist is a list of **product IDs** (`ref: 'Product'`), not copies of products. So when a product's price or stock changes, the wishlist shows the new value automatically.
+The wishlist is a list of **product IDs** (`ref: 'Product'`), and the cart is a list of `{ product: <product ID>, quantity }`. Neither stores copies of products, so when a product's price or stock changes, both show the new value automatically. Totals such as subtotal and item count are never stored; they are calculated from the cart.
 
 Categories: `Electronics`, `Fashion`, `Books`, `Home` (case-sensitive).
 
@@ -105,8 +105,14 @@ Base URL `http://localhost:5001`. 🔒 = requires login.
 | POST | `/wishlist/:productId` | 🔒 | Save a product |
 | DELETE | `/wishlist/:productId` | 🔒 | Remove a product |
 | PATCH | `/wishlist/:productId/toggle` | 🔒 | Save if not saved, remove if saved |
+| GET | `/cart` | 🔒 | Current user's cart (with product details) |
+| POST | `/cart/:productId` | 🔒 | Add 1 (new item, or +1 if already in the cart) |
+| PATCH | `/cart/:productId` | 🔒 | Set quantity, body `{ "quantity": 3 }` |
+| DELETE | `/cart/:productId` | 🔒 | Remove from cart |
 
-**Status codes:** `200` OK · `201` created · `400` bad input or invalid ID · `401` not logged in · `404` not found · `409` already exists (email or wishlist item) · `500` server error
+Every cart endpoint returns the updated cart. Quantities must be whole numbers from 1 up to the product's stock, otherwise the API returns `400`.
+
+**Status codes:** `200` OK · `201` created · `400` bad input, invalid ID or not enough stock · `401` not logged in · `404` not found · `409` already exists (email or wishlist item) · `500` server error
 
 Example product body:
 
@@ -131,6 +137,8 @@ Example product body:
 
 **Wishlist:** saving runs one MongoDB update that only adds the product if it isn't already there (`$ne` + `$push`). This prevents duplicates even if the button is clicked twice, and a repeat returns `409`. Reading the wishlist uses `populate()` to turn the stored IDs into full product details.
 
+**Cart:** adding a product first tries to insert a new row (only if the product isn't in the cart yet). If the product is already there, it adds 1 to that row (`$inc`), but only while the quantity is below the stock. Both checks run inside a single MongoDB update, so parallel clicks can neither create duplicate rows nor go past the stock. On the frontend, `CartContext` holds the one shared copy of the cart. The navbar count, product cards and cart page all read from it, and after every change it is replaced with the cart returned by the API, so they always agree.
+
 ---
 
 ## Testing with Postman
@@ -150,3 +158,4 @@ Example product body:
 | Every category shows "No products found" | Run `npm run seed`, or add products with `POST /products` |
 | A product is missing from its category | Spell the category exactly: `Electronics`, `Fashion`, `Books`, `Home` |
 | A new endpoint returns `Cannot GET …` | Restart the backend |
+| Cart shows "Only X left. Please reduce the quantity." | Stock went down after the item was added. Press − or Remove |

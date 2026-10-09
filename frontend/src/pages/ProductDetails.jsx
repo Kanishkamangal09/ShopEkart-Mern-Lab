@@ -1,21 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getProductById } from '../services/api';
-import { useCart } from '../context/useCart';
 import { formatPrice } from '../data/categories';
 import StockStatus from '../components/StockStatus';
+import AddToCartButton from '../components/AddToCartButton';
 import Loader from '../components/Loader';
 import Icon from '../components/Icon';
 
 function ProductDetails() {
   // :id from the URL, e.g. /products/66d123abc456
   const { id } = useParams();
-  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -39,17 +37,6 @@ function ProductDetails() {
 
     fetchProduct();
   }, [id]);
-
-  const handleAddToCart = () => {
-    addToCart({
-      id: product._id,
-      name: product.name,
-      price: product.price,
-      category: product.category,
-      image: product.image
-    });
-    setAdded(true);
-  };
 
   if (loading) {
     return <Loader text="Loading product..." />;
@@ -86,15 +73,9 @@ function ProductDetails() {
           <StockStatus stock={product.stock} />
           <p className="details-description">{product.description}</p>
 
-          <button
-            type="button"
-            className={`btn btn-lg ${added ? 'btn-success' : 'btn-primary'}`}
-            onClick={handleAddToCart}
-            disabled={product.stock === 0}
-          >
-            <Icon name={added ? 'check' : 'cart'} size={18} />
-            {product.stock === 0 ? 'Out of stock' : added ? 'Added to cart' : 'Add to Cart'}
-          </button>
+          <div className="details-cart">
+            <AddToCartButton product={product} large />
+          </div>
         </div>
       </div>
     </div>

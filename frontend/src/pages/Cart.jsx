@@ -1,55 +1,48 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/useCart';
 import { formatPrice } from '../data/categories';
+import CartItem from '../components/CartItem';
+import Loader from '../components/Loader';
 import Icon from '../components/Icon';
 
-const FREE_SHIPPING_LIMIT = 999;
-const SHIPPING_FEE = 49;
-
 function Cart() {
-  const { items, cartCount, subtotal, updateQuantity, removeFromCart, clearCart } = useCart();
-  const [orderPlaced, setOrderPlaced] = useState(false);
+  const { cartItems, loading, error, cartCount, subtotal, refreshCart } = useCart();
 
-  const shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_LIMIT ? 0 : SHIPPING_FEE;
-  const total = subtotal + shipping;
+  if (loading) {
+    return <Loader text="Loading your cart..." />;
+  }
 
-  const handleCheckout = () => {
-    clearCart();
-    setOrderPlaced(true);
-  };
-
-  if (orderPlaced) {
+  if (error) {
     return (
       <div className="container page">
-        <div className="empty-state card">
-          <span className="success-icon">
-            <Icon name="check" size={32} />
-          </span>
-          <h3>Order placed successfully!</h3>
-          <p>Thanks for shopping with ShopKart. (This is a demo, no payment was taken.)</p>
-          <Link to="/home" className="btn btn-primary">
-            Continue shopping
-          </Link>
+        <div className="empty-state">
+          <h3>Unable to load your cart.</h3>
+          <p>Please check your connection and try again.</p>
+          <button type="button" className="btn btn-primary" onClick={refreshCart}>
+            Try Again
+          </button>
         </div>
       </div>
     );
   }
 
-  if (items.length === 0) {
+  if (cartItems.length === 0) {
     return (
       <div className="container page">
-        <div className="empty-state card">
+        <div className="empty-state">
           <Icon name="cart" size={40} />
-          <h3>Your cart is empty</h3>
+          <h3>Your cart is empty 🛒</h3>
           <p>Looks like you haven&apos;t added anything yet.</p>
           <Link to="/products" className="btn btn-primary">
-            Start shopping
+            Browse Products
           </Link>
         </div>
       </div>
     );
   }
+
+  // checkout should not continue if any item is above the current stock
+  const hasStockProblem = cartItems.some((item) => item.quantity > item.product.stock);
 
   return (
     <div className="container page">
@@ -57,78 +50,33 @@ function Cart() {
         <Link to="/products" className="back-link">
           <Icon name="arrowLeft" size={18} /> Continue shopping
         </Link>
-        <h1>
-          Shopping cart <span className="muted">({cartCount} items)</span>
-        </h1>
+        <h1>My Cart</h1>
       </div>
 
       <div className="cart-layout">
         <div className="card cart-list">
-          {items.map((item) => (
-            <div key={item.id} className="cart-item">
-              <img src={item.image} alt={item.name} className="cart-thumb" />
-              <div className="cart-info">
-                <span className="product-category">{item.category}</span>
-                <h3>{item.name}</h3>
-                <div className="price-row">
-                  <strong>{formatPrice(item.price)}</strong>
-                </div>
-              </div>
-              <div className="qty">
-                <button
-                  type="button"
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  aria-label="Decrease quantity"
-                >
-                  <Icon name="minus" size={16} />
-                </button>
-                <span>{item.quantity}</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  aria-label="Increase quantity"
-                >
-                  <Icon name="plus" size={16} />
-                </button>
-              </div>
-              <strong className="cart-line-total">{formatPrice(item.price * item.quantity)}</strong>
-              <button
-                type="button"
-                className="icon-btn icon-btn-danger"
-                onClick={() => removeFromCart(item.id)}
-                aria-label={`Remove ${item.name}`}
-              >
-                <Icon name="trash" size={18} />
-              </button>
-            </div>
+          {cartItems.map((item) => (
+            <CartItem key={item.product._id} item={item} />
           ))}
         </div>
 
         <aside className="card summary">
-          <h2>Order summary</h2>
+          <h2>Order Summary</h2>
           <div className="summary-row">
+            <span>Items</span>
+            <span>{cartCount}</span>
+          </div>
+          <div className="summary-row summary-total">
             <span>Subtotal</span>
             <span>{formatPrice(subtotal)}</span>
           </div>
-          <div className="summary-row">
-            <span>Shipping</span>
-            <span>{shipping === 0 ? <span className="text-success">Free</span> : formatPrice(shipping)}</span>
-          </div>
-          {shipping > 0 && (
-            <p className="summary-note">
-              Add {formatPrice(FREE_SHIPPING_LIMIT - subtotal)} more for free delivery.
-            </p>
+          {hasStockProblem && (
+            <p className="summary-note">Some items are above the available stock. Please update them.</p>
           )}
-          <div className="summary-row summary-total">
-            <span>Total</span>
-            <span>{formatPrice(total)}</span>
-          </div>
-          <button type="button" className="btn btn-primary btn-block btn-lg" onClick={handleCheckout}>
-            Place order
+          <button type="button" className="btn btn-primary btn-block btn-lg" disabled={hasStockProblem}>
+            Proceed to Checkout
           </button>
-          <button type="button" className="btn btn-ghost btn-block" onClick={clearCart}>
-            Clear cart
-          </button>
+          <p className="summary-small">Delivery charges are calculated at checkout.</p>
         </aside>
       </div>
     </div>

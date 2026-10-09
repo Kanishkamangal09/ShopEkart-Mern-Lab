@@ -67,10 +67,9 @@ function Navbar() {
             Wishlist{wishlistCount > 0 && <span className="nav-count">{wishlistCount}</span>}
           </NavLink>
 
-          <Link to="/cart" className="icon-btn" aria-label={`Cart, ${cartCount} items`}>
-            <Icon name="cart" />
-            {cartCount > 0 && <span className="badge">{cartCount}</span>}
-          </Link>
+          <NavLink to="/cart" className="nav-link">
+            Cart{cartCount > 0 && <span className="nav-count nav-count-cart">{cartCount}</span>}
+          </NavLink>
 
           <Link to="/profile" className="avatar-link" title="My profile">
             <span className="avatar avatar-sm">{user.fullName.charAt(0).toUpperCase()}</span>

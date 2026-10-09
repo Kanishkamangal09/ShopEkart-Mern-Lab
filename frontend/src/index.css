@@ -888,6 +888,24 @@ button {
   margin-top: auto;
 }
 
+/* ---------- cart buttons ---------- */
+
+.cart-msg {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  text-align: center;
+  color: var(--success);
+}
+
+.cart-msg.is-error {
+  color: var(--danger);
+}
+
+.details-cart {
+  width: 100%;
+  max-width: 320px;
+}
+
 /* ---------- wishlist ---------- */
 
 .btn-wishlist-saved {
@@ -965,6 +983,11 @@ button {
   font-weight: 700;
   line-height: 20px;
   text-align: center;
+}
+
+.nav-count-cart {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
 }
 
 .page-head-row {
@@ -1163,8 +1186,39 @@ button {
   font-weight: 600;
 }
 
+.cart-info h3 a:hover {
+  color: var(--primary-dark);
+}
+
+.cart-warning {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--danger);
+}
+
+.cart-item.is-busy {
+  opacity: 0.6;
+}
+
 .cart-line-total {
   text-align: right;
+}
+
+.cart-remove:hover:not(:disabled) {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.qty button:disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.summary-small {
+  font-size: 0.82rem;
+  text-align: center;
+  color: var(--text-muted);
 }
 
 .qty {
@@ -1472,7 +1526,7 @@ button {
     grid-area: total;
   }
 
-  .cart-item .icon-btn-danger {
+  .cart-item .cart-remove {
     grid-area: remove;
     justify-self: end;
   }

@@ -14,7 +14,13 @@ export async function apiRequest(endpoint, options = {}) {
     config.body = JSON.stringify(config.body);
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, config);
+  let response;
+  try {
+    response = await fetch(`${API_URL}${endpoint}`, config);
+  } catch {
+    // fetch only throws when the server can't be reached at all (offline / server down)
+    throw { status: 0, message: 'Unable to reach the server. Please try again.' };
+  }
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
@@ -71,4 +77,26 @@ export async function removeFromWishlist(productId) {
   const data = await apiRequest(`/wishlist/${productId}`, { method: 'DELETE' });
   updateWishlistCount(data.count);
   return data;
+}
+
+// ---------- Cart APIs (all need login). Every response returns the updated cart. ----------
+
+// GET /cart
+export function fetchCart() {
+  return apiRequest('/cart');
+}
+
+// POST /cart/:productId  (adds 1)
+export function addCartItem(productId) {
+  return apiRequest(`/cart/${productId}`, { method: 'POST' });
+}
+
+// PATCH /cart/:productId  body: { quantity }
+export function updateCartItem(productId, quantity) {
+  return apiRequest(`/cart/${productId}`, { method: 'PATCH', body: { quantity } });
+}
+
+// DELETE /cart/:productId
+export function removeCartItem(productId) {
+  return apiRequest(`/cart/${productId}`, { method: 'DELETE' });
 }
